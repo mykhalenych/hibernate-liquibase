@@ -1,5 +1,7 @@
 package mate.academy.liquibase.dao;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -12,7 +14,7 @@ import liquibase.Liquibase;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
-import liquibase.resource.ClassLoaderResourceAccessor;
+import liquibase.resource.DirectoryResourceAccessor;
 import org.hibernate.Interceptor;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -125,9 +127,9 @@ public abstract class AbstractTest {
             try {
                 Connection connection = dataSource.getConnection();
                 DatabaseConnection liquibaseConnection = new JdbcConnection(connection);
-                Liquibase liquibase = new Liquibase("db/changelog/db.changelog-master.yaml", new ClassLoaderResourceAccessor(), liquibaseConnection);
+                Liquibase liquibase = new Liquibase("db/changelog/db.changelog-master.yaml", new DirectoryResourceAccessor(new File(".").toPath()), liquibaseConnection);
                 liquibase.update(new Contexts(), new LabelExpression());
-            } catch (LiquibaseException | SQLException e) {
+            } catch (LiquibaseException | SQLException | FileNotFoundException e) {
                 throw new RuntimeException("Failed to run liquibase", e);
             }
 
